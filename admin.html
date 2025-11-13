@@ -1,135 +1,310 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel | OSINT Group</title>
-  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel — OSINT Group</title>
+  <link rel="icon" href="logo.png" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #020a12, #031826);
-      color: #e8f0f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+    :root{--bg1:#f6f8ff;--bg2:#e8f0ff;--panel:#ffffff;--muted:#65748b;--accent:#2563eb}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+
+    /* Soft gradient waves background */
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient( circle at 10% 20%, rgba(37,99,235,0.10), transparent 20%),
+                  radial-gradient( circle at 90% 80%, rgba(34,197,94,0.06), transparent 15%),
+                  linear-gradient(135deg,#edf2ff 0%, #f8fafc 50%, #eef2ff 100%);
+      overflow:hidden;
     }
 
-    .login-box, .panel-box {
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-    }
+    /* animated waves */
+    .wave-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+    .wave{\position:absolute;left:-10%;width:120%;height:40vh;border-radius:50%;filter:blur(40px);opacity:0.65;animation:move 12s linear infinite}
+    .wave.w1{top:10%;background:linear-gradient(90deg,#a5b4fc,#60a5fa);animation-duration:18s}
+    .wave.w2{top:40%;background:linear-gradient(90deg,#34d399,#60a5fa);animation-duration:14s;opacity:0.45}
+    .wave.w3{top:70%;background:linear-gradient(90deg,#bfdbfe,#c7f9cc);animation-duration:22s;opacity:0.35}
+    @keyframes move{0%{transform:translateX(-5%) translateY(0) scale(1)}50%{transform:translateX(5%) translateY(-6%) scale(1.05)}100%{transform:translateX(-5%) translateY(0) scale(1)}}
 
-    h1 {
-      margin-bottom: 20px;
-      color: #00c6ff;
-      text-shadow: 0 0 10px rgba(0,198,255,0.2);
-    }
+    /* main layout */
+    .container{position:relative;z-index:2;width:100%;max-width:1100px;padding:28px}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{height:56px;width:56px;border-radius:10px;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    h1{font-size:20px;margin:0}
+    .subtitle{color:var(--muted);font-size:13px}
 
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 10px 14px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05);
-      color: #e8f0f5;
-      font-size: 15px;
-    }
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
-    button {
-      background: linear-gradient(135deg, #0af, #00c6ff);
-      border: none;
-      color: #000;
-      font-weight: 600;
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
+    .card{background:var(--panel);border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06)}
+    .card h2{margin:0 0 10px 0}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], input[type=url], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef8;background:#fff;font-size:14px}
+    textarea{min-height:110px;resize:vertical}
+    .row{display:flex;gap:10px}
+    .row .col{flex:1}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid #dbeafe;color:#0f172a}
+    .small{font-size:13px;color:var(--muted)}
 
-    button:hover {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
+    /* admin list styles */
+    .admin-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .admin-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;border:1px solid #eef2ff}
+    .admin-item .name{flex:1}
+    .admin-item button{padding:6px 8px;border-radius:6px;border:0;background:#ef4444;color:#fff;cursor:pointer}
 
-    .logout-btn {
-      background: #ff5757;
-      color: #fff;
-      margin-top: 15px;
-    }
+    .logs{max-height:220px;overflow:auto;padding-right:8px}
+    .muted{color:var(--muted)}
 
-    .footer {
-      position: fixed;
-      bottom: 10px;
-      color: #7f9cb0;
-      font-size: 0.9rem;
-    }
+    .login-panel{max-width:420px;margin:0 auto}
+    .footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
-  <div id="loginBox" class="login-box">
-    <h1>Admin Login</h1>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button onclick="login()">Login</button>
+  <div class="wave-wrap" aria-hidden="true">
+    <div class="wave w1"></div>
+    <div class="wave w2"></div>
+    <div class="wave w3"></div>
   </div>
 
-  <div id="panelBox" class="panel-box" style="display:none;">
-    <h1>Welcome, Admin</h1>
-    <p>You're now logged into the OSINT Group Admin Panel.</p>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
+  <div class="container">
+    <div id="authArea">
+      <!-- Login box (shown when not logged in) -->
+      <div class="card login-panel" id="loginBox">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+          <div class="logo">AD</div>
+          <div>
+            <h1>Admin Panel</h1>
+            <div class="subtitle">Sign in to manage members, text & settings</div>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label>Username</label>
+          <input id="loginUser" type="text" placeholder="admin" value="admin" />
+          <label style="margin-top:8px">Password</label>
+          <input id="loginPass" type="password" placeholder="1234" />
+          <div style="margin-top:12px;display:flex;gap:10px">
+            <button class="btn" onclick="doLogin()">Login</button>
+            <button class="btn ghost" onclick="fillDemo()">Fill demo data</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="footer">© 2025 OSINT Group — Admin Area</div>
+    <div id="panelArea" style="display:none">
+      <div class="top">
+        <div class="brand">
+          <div class="logo">OS</div>
+          <div>
+            <h1>OSINT Group — Control Panel</h1>
+            <div class="subtitle">Manage the site content and group settings</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="small" id="visitCount">Visits: 0</div>
+          <button class="btn ghost" onclick="goHome()">Open Homepage</button>
+          <button class="btn" onclick="doLogout()">Logout</button>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="card">
+            <h2>Manage Admins</h2>
+            <label>Add Telegram username (example: @username)</label>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <input id="newAdmin" type="text" placeholder="@admin_user" />
+              <button class="btn" onclick="addAdmin()">Add</button>
+            </div>
+
+            <div class="admin-list" id="adminsContainer"></div>
+            <div style="margin-top:10px">
+              <button class="btn ghost" onclick="exportAdmins()">Export</button>
+              <button class="btn ghost" onclick="importAdmins()">Import</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Edit “What is OSINT”</h2>
+            <label>Homepage modal content</label>
+            <textarea id="osintText"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" onclick="saveOsint()">Save</button>
+              <button class="btn ghost" onclick="resetOsint()">Reset</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Telegram Links</h2>
+            <label>Group / Invite link</label>
+            <input id="inviteLink" type="url" placeholder="https://t.me/your_group_invite" />
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" onclick="saveLink()">Save Link</button>
+              <button class="btn ghost" onclick="clearLink()">Clear</button>
+            </div>
+            <p class="small" style="margin-top:8px">Current: <span id="currentLink" class="muted">(not set)</span></p>
+          </div>
+        </div>
+
+        <aside>
+          <div class="card">
+            <h2>Access Logs</h2>
+            <p class="small">This counts homepage opens — stored locally in each visitor’s browser. Useful for quick stats.</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" onclick="resetVisits()">Reset Visits</button>
+              <button class="btn ghost" onclick="exportState()">Export All</button>
+            </div>
+            <div style="margin-top:10px" class="logs" id="logs"></div>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h2>Theme / Background</h2>
+            <label>Background type</label>
+            <select id="bgType" onchange="applyBg()">
+              <option value="waves">Animated Waves</option>
+              <option value="particles">Particles</option>
+              <option value="custom">Custom Image</option>
+            </select>
+            <label style="margin-top:8px">Custom image URL</label>
+            <input id="bgUrl" type="url" placeholder="https://example.com/bg.jpg" />
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn" onclick="saveBg()">Save</button>
+              <button class="btn ghost" onclick="resetBg()">Reset</button>
+            </div>
+            <p class="small" style="margin-top:8px">Preview below:</p>
+            <div id="bgPreview" style="height:70px;border-radius:8px;border:1px solid #eef2ff;margin-top:8px"></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer">Changes saved to browser storage. For a shared site, consider adding a small server when you're ready.</div>
+    </div>
+  </div>
 
   <script>
-    // Simple static login (for demo only)
-    const correctUser = "admin";
-    const correctPass = "1234";
+    // --- Basic Auth (demo) ---
+    const DEMO_USER = 'admin';
+    const DEMO_PASS = '1234';
 
-    function login() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-
-      if (user === correctUser && pass === correctPass) {
-        localStorage.setItem('loggedIn', 'true');
+    function doLogin(){
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      if(u === DEMO_USER && p === DEMO_PASS){
+        localStorage.setItem('osint_logged','1');
         showPanel();
       } else {
         alert('Invalid credentials');
       }
     }
 
-    function logout() {
-      localStorage.removeItem('loggedIn');
-      showLogin();
+    function doLogout(){
+      localStorage.removeItem('osint_logged');
+      location.reload();
     }
 
-    function showPanel() {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('panelBox').style.display = 'block';
+    function showPanel(){
+      document.getElementById('authArea').style.display = 'none';
+      document.getElementById('panelArea').style.display = 'block';
+      loadState();
     }
 
-    function showLogin() {
-      document.getElementById('loginBox').style.display = 'block';
-      document.getElementById('panelBox').style.display = 'none';
+    // --- State keys & helpers ---
+    const KEY_ADMINS = 'osint_admins';
+    const KEY_OSINT = 'osint_text';
+    const KEY_INVITE = 'osint_invite';
+    const KEY_VISITS = 'osint_visits';
+    const KEY_BG = 'osint_bg';
+
+    function loadState(){
+      // visits
+      document.getElementById('visitCount').textContent = 'Visits: ' + (localStorage.getItem(KEY_VISITS) || 0);
+
+      // admins
+      renderAdmins();
+
+      // osint text
+      const t = localStorage.getItem(KEY_OSINT) || 'OSINT (Open Source Intelligence) is the process of collecting and analyzing publicly available information for investigative purposes. Always act legally and ethically.';
+      document.getElementById('osintText').value = t;
+
+      // invite
+      const inv = localStorage.getItem(KEY_INVITE) || '';
+      document.getElementById('inviteLink').value = inv;
+      document.getElementById('currentLink').textContent = inv || '(not set)';
+
+      // bg
+      const bg = JSON.parse(localStorage.getItem(KEY_BG) || JSON.stringify({type:'waves',url:''}));
+      document.getElementById('bgType').value = bg.type || 'waves';
+      document.getElementById('bgUrl').value = bg.url || '';
+      previewBg(bg);
+
+      renderLogs();
     }
 
-    // Check login state
-    if (localStorage.getItem('loggedIn') === 'true') {
-      showPanel();
+    // --- Admin management ---
+    function getAdmins(){
+      try{const s = localStorage.getItem(KEY_ADMINS); return s ? JSON.parse(s) : []}catch(e){return []}
     }
+    function saveAdmins(arr){ localStorage.setItem(KEY_ADMINS, JSON.stringify(arr)); renderAdmins(); }
+
+    function renderAdmins(){
+      const container = document.getElementById('adminsContainer'); container.innerHTML = '';
+      const admins = getAdmins();
+      if(admins.length === 0){ container.innerHTML = '<div class="small muted">No admins yet.</div>'; return }
+      admins.forEach((a, idx)=>{
+        const div = document.createElement('div'); div.className = 'admin-item';
+        const name = document.createElement('div'); name.className='name'; name.textContent = a;
+        const dm = document.createElement('a'); dm.className='btn ghost'; dm.textContent='DM'; dm.href = 'https://t.me/' + a.replace('@',''); dm.target='_blank';
+        const del = document.createElement('button'); del.textContent='Remove'; del.onclick = ()=>{ if(confirm('Remove '+a+'?')){ admins.splice(idx,1); saveAdmins(admins);} };
+        div.appendChild(name); div.appendChild(dm); div.appendChild(del);
+        container.appendChild(div);
+      })
+    }
+
+    function addAdmin(){
+      const v = document.getElementById('newAdmin').value.trim(); if(!v) return alert('Enter username');
+      const admins = getAdmins(); if(admins.includes(v)) return alert('Already added');
+      admins.push(v); saveAdmins(admins); document.getElementById('newAdmin').value='';
+    }
+
+    function exportAdmins(){ const data = getAdmins(); prompt('Copy admins JSON', JSON.stringify(data)); }
+    function importAdmins(){ const s = prompt('Paste admins JSON'); try{ const a = JSON.parse(s); if(Array.isArray(a)){ saveAdmins(a); alert('Imported'); } else alert('Invalid format'); }catch(e){ alert('JSON error'); } }
+
+    // --- OSINT text ---
+    function saveOsint(){ const v = document.getElementById('osintText').value.trim(); localStorage.setItem(KEY_OSINT, v); alert('Saved'); }
+    function resetOsint(){ if(confirm('Reset to default?')){ localStorage.removeItem(KEY_OSINT); loadState(); } }
+
+    // --- Links ---
+    function saveLink(){ const v = document.getElementById('inviteLink').value.trim(); localStorage.setItem(KEY_INVITE, v); document.getElementById('currentLink').textContent = v || '(not set)'; alert('Saved'); }
+    function clearLink(){ localStorage.removeItem(KEY_INVITE); document.getElementById('inviteLink').value=''; document.getElementById('currentLink').textContent='(not set)'; }
+
+    // --- Visits / Logs ---
+    function renderLogs(){ const logs = localStorage.getItem(KEY_VISITS) || 0; const el = document.getElementById('logs'); el.innerHTML = '<div class="small">Total homepage opens recorded on this browser: <strong>' + logs + '</strong></div>'; }
+    function resetVisits(){ if(confirm('Reset visit count?')){ localStorage.removeItem(KEY_VISITS); document.getElementById('visitCount').textContent='Visits: 0'; renderLogs(); } }
+
+    // --- Background ---
+    function saveBg(){ const bg = {type:document.getElementById('bgType').value, url:document.getElementById('bgUrl').value.trim()}; localStorage.setItem(KEY_BG, JSON.stringify(bg)); previewBg(bg); alert('Saved'); }
+    function resetBg(){ localStorage.removeItem(KEY_BG); const bg = {type:'waves',url:''}; document.getElementById('bgType').value=bg.type; document.getElementById('bgUrl').value=''; previewBg(bg); alert('Reset'); }
+    function previewBg(bg){ const p = document.getElementById('bgPreview'); if(bg.type === 'custom' && bg.url){ p.style.backgroundImage = 'url(' + bg.url + ')'; p.style.backgroundSize='cover'; p.style.backgroundPosition='center'; } else if(bg.type === 'particles'){ p.style.background='linear-gradient(90deg,#f0f9ff,#ecfeff)'; } else { p.style.background='linear-gradient(90deg,#eef2ff,#f8fafc)'; } }
+    function applyBg(){ const type = document.getElementById('bgType').value; // immediate visual adjust for admin page only
+      const wrap = document.querySelector('.wave-wrap'); if(type === 'particles'){ wrap.style.display='none'; document.body.style.background='linear-gradient(135deg,#fff 0%,#f1f5f9 100%)'; } else if(type === 'custom'){ wrap.style.display='none'; const url = document.getElementById('bgUrl').value.trim(); document.body.style.background = url ? 'url('+url+') center/cover fixed' : 'linear-gradient(135deg,#edf2ff,#f8fafc)'; } else { wrap.style.display='block'; document.body.style.background='radial-gradient( circle at 10% 20%, rgba(37,99,235,0.10), transparent 20%), radial-gradient( circle at 90% 80%, rgba(34,197,94,0.06), transparent 15%), linear-gradient(135deg,#edf2ff 0%, #f8fafc 50%, #eef2ff 100%)'; } }
+
+    // --- Export/Import whole state ---
+    function exportState(){ const state = { admins: getAdmins(), osint: localStorage.getItem(KEY_OSINT)||'', invite: localStorage.getItem(KEY_INVITE)||'', visits: localStorage.getItem(KEY_VISITS)||0, bg: JSON.parse(localStorage.getItem(KEY_BG)||'{}') }; prompt('Copy site state JSON', JSON.stringify(state)); }
+
+    // --- Helpers ---
+    function goHome(){ window.open('index.html','_self'); }
+    function doLogout(){ if(confirm('Logout?')){ localStorage.removeItem('osint_logged'); location.reload(); } }
+
+    function fillDemo(){ // populate demo data for convenience
+      saveAdmins(['@zero_osint','@sf_admin']); localStorage.setItem(KEY_OSINT,'OSINT (Open Source Intelligence) is the practice of collecting and analyzing publicly available information. Use ethically.'); localStorage.setItem(KEY_INVITE,'https://t.me/your_group_invite'); localStorage.setItem(KEY_VISITS,'42'); localStorage.setItem(KEY_BG, JSON.stringify({type:'waves',url:''})); loadState(); alert('Demo data loaded'); }
+
+    // auto-init
+    (function(){ if(localStorage.getItem('osint_logged')==='1'){ showPanel(); } else { /* show login */ } })();
   </script>
 </body>
 </html>
