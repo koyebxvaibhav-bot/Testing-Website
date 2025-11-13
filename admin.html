@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel | OSINT Group</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #020a12, #031826);
+      color: #e8f0f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .login-box, .panel-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #00c6ff;
+      text-shadow: 0 0 10px rgba(0,198,255,0.2);
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: #e8f0f5;
+      font-size: 15px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #0af, #00c6ff);
+      border: none;
+      color: #000;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      background: #ff5757;
+      color: #fff;
+      margin-top: 15px;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 10px;
+      color: #7f9cb0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="loginBox" class="login-box">
+    <h1>Admin Login</h1>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="panelBox" class="panel-box" style="display:none;">
+    <h1>Welcome, Admin</h1>
+    <p>You're now logged into the OSINT Group Admin Panel.</p>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="footer">© 2025 OSINT Group — Admin Area</div>
+
+  <script>
+    // Simple static login (for demo only)
+    const correctUser = "admin";
+    const correctPass = "1234";
+
+    function login() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      if (user === correctUser && pass === correctPass) {
+        localStorage.setItem('loggedIn', 'true');
+        showPanel();
+      } else {
+        alert('Invalid credentials');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('loggedIn');
+      showLogin();
+    }
+
+    function showPanel() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('panelBox').style.display = 'block';
+    }
+
+    function showLogin() {
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('panelBox').style.display = 'none';
+    }
+
+    // Check login state
+    if (localStorage.getItem('loggedIn') === 'true') {
+      showPanel();
+    }
+  </script>
+</body>
+</html>
