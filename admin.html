@@ -14,8 +14,9 @@
     body{
       min-height:100vh;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
+      padding-top:36px;
       background: radial-gradient( circle at 10% 20%, rgba(37,99,235,0.10), transparent 20%),
                   radial-gradient( circle at 90% 80%, rgba(34,197,94,0.06), transparent 15%),
                   linear-gradient(135deg,#edf2ff 0%, #f8fafc 50%, #eef2ff 100%);
@@ -24,7 +25,7 @@
 
     /* animated waves */
     .wave-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-    .wave{\position:absolute;left:-10%;width:120%;height:40vh;border-radius:50%;filter:blur(40px);opacity:0.65;animation:move 12s linear infinite}
+    .wave{position:absolute;left:-10%;width:120%;height:40vh;border-radius:50%;filter:blur(40px);opacity:0.65;animation:move 12s linear infinite}
     .wave.w1{top:10%;background:linear-gradient(90deg,#a5b4fc,#60a5fa);animation-duration:18s}
     .wave.w2{top:40%;background:linear-gradient(90deg,#34d399,#60a5fa);animation-duration:14s;opacity:0.45}
     .wave.w3{top:70%;background:linear-gradient(90deg,#bfdbfe,#c7f9cc);animation-duration:22s;opacity:0.35}
